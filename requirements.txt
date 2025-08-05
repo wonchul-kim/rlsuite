@@ -1,0 +1,3 @@
+gymnasium
+pyrep
+dm-env
