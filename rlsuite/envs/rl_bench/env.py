@@ -280,7 +280,7 @@ class RLBench:
         # Setup observation configs
         obs_config = ObservationConfig()
         obs_config.set_all_high_dim(False)
-        obs_config.set_all_low_dim(False)
+        obs_config.set_all_low_dim(True)
         assert (
             "joint_positions" in self._state_keys
         ), "joint position is required as this code assumes joint control"
@@ -426,3 +426,58 @@ class RLBench:
         self.close()
 
 
+if __name__ == '__main__':
+    import argparse 
+    import os.path as osp
+    import os
+    from pathlib import Path
+    from tqdm import tqdm
+    import time
+    
+    from rlsuite.envs.rl_bench.env import make
+    from rlsuite.envs.rl_bench.utils.video_recorder import VideoRecorder
+
+
+    cfg = argparse.ArgumentParser().parse_args()
+    cfg.task_name = 'take_lid_off_saucepan'
+    cfg.episode_length = 100
+    cfg.frame_stack = 8
+    cfg.dataset_root = '/HDD/etc/rlbench_demo'
+    cfg.num_demos = 100
+    cfg.arm_max_velocity = 2.0
+    cfg.arm_max_acceleration = 8.0
+    cfg.camera_shape = [84,84]
+    cfg.camera_keys = ['front', 'wrist', 'left_shoulder', 'right_shoulder']
+    cfg.state_keys = ['joint_positions', 'gripper_open']
+    cfg.renderer = 'opengl3'
+    
+    cfg.output_dir = '/HDD/etc/rlbench_demo/video'
+    os.makedirs(cfg.output_dir, exist_ok=True)
+    
+    env = make(
+            cfg.task_name,
+            cfg.episode_length,
+            cfg.frame_stack,
+            cfg.dataset_root,
+            cfg.arm_max_velocity,
+            cfg.arm_max_acceleration,
+            cfg.camera_shape,
+            cfg.camera_keys,
+            cfg.state_keys,
+            cfg.renderer,
+        )
+    
+    print(f"rgb_raw_observation_spec: {env.rgb_raw_observation_spec()}")
+    print(f"low_dim_raw_observation_spec: {env.low_dim_raw_observation_spec()}")
+    print(f"action_spec: {env.action_spec()}")
+    
+    
+    time_step = env.reset()
+    print(time_step)
+    for _ in range(10):
+        tic = time.time()
+        action = np.random.normal(size=env.action_spec().shape)
+        action = np.clip(action, -1, 1)
+        # time_step = env.step(action)
+        output = env._env.task.step(action)
+        print(f"step: {time.time() - tic}")

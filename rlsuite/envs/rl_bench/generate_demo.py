@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     cfg = argparse.ArgumentParser().parse_args()
     cfg.task_name = 'take_lid_off_saucepan'
-    cfg.episode_length = 100
+    cfg.episode_length = 10000
     cfg.frame_stack = 8
     cfg.dataset_root = '/HDD/etc/rlbench_demo'
     cfg.num_demos = 100
@@ -59,5 +59,5 @@ if __name__ == '__main__':
         
     
 '''
-CUDA_VISIBLE_DEVICES=1 DISPLAY=:1.0 python dataset_generator.py --save_path=/HDD/etc/rlbench_demo --image_size 84 84 --renderer opengl3 --episodes_per_task 100 --variations 1 --processes 1 --tasks move_hanger --arm_max_velocity 2.0 --arm_max_acceleration 8.0
+CUDA_VISIBLE_DEVICES=1 DISPLAY=:1.0 python dataset_generator.py --save_path=/HDD/etc/rlbench_demo --image_size 84 84 --renderer opengl3 --episodes_per_task 10000 --variations 1 --processes 1 --tasks reach_target --arm_max_velocity 2.0 --arm_max_acceleration 8.0
 '''

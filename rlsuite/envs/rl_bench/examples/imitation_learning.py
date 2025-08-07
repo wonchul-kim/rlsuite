@@ -18,7 +18,7 @@ class ImitationLearning(object):
 
 
 # To use 'saved' demos, set the path below, and set live_demos=False
-live_demos = True
+live_demos = False
 DATASET = '' if live_demos else 'PATH/TO/YOUR/DATASET'
 
 obs_config = ObservationConfig()
@@ -28,9 +28,10 @@ env = Environment(
     action_mode=MoveArmThenGripper(
         arm_action_mode=JointVelocity(), gripper_action_mode=Discrete()),
     obs_config=ObservationConfig(),
-    headless=False,
+    headless=True,
     arm_max_velocity=2.0,
     arm_max_acceleration=8.0,
+    dataset_root='/HDD/etc/outputs/rlsuite/rlbench',
     )
 env.launch()
 
