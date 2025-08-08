@@ -72,7 +72,7 @@ class RLBenchEnv:
                         arm_max_acceleration=arm_max_acceleration,
                         obs_config=obs_config,
                         dataset_root=self._config['env']['dataset_root'],
-                        headless=True)
+                        headless=self._config['env']['headless'])
         self._env.launch()
 
         self._task = self._env.get_task(name_to_task_class(task_name))
@@ -244,10 +244,13 @@ class RLBenchEnv:
         else:
             out['high_dim_obs'] = np.array([])
             
+        out['task_low_dim_state'] = obs['task_low_dim_state']
+        out['gripper_pose'] = obs['gripper_pose']
+        
         return out
         
         
-    def get_demos(self):
+    def get_demos(self, modify=True):
         
         live_demos = not self._config['env']['dataset_root']
         
@@ -258,7 +261,6 @@ class RLBenchEnv:
             
             episode_demo = self.modify_raw_demos(episode_raw_demo)
             
-            demos.append(episode_demo)
             if episode_demo is not None:
                 demos.append(episode_demo)
             else:
@@ -309,6 +311,13 @@ class RLBenchEnv:
                 reward = 1.0
                 terminal = 1
                 
+            # if step_idx >= 20 and step_idx <=30: 
+            #     print('prev_obs.joint_positions: ', episode_raw_demo[step_idx - 1].joint_positions)
+            #     print('curr_obs.action: ', step_raw_demo.misc["joint_position_action"][:-1])
+            #     print('curr_obs.joint_positions: ', step_raw_demo.joint_positions)
+            #     print('accurcy: ', abs(step_raw_demo.joint_positions - step_raw_demo.misc["joint_position_action"][:-1]))
+            #     print('action: ', action)
+            #     print("---------------------------------------------------------------------------------")
                 
             if self._config['custom_reward']:
                 reward = reshape_reward_function(step_raw_demo, terminal, reward)
