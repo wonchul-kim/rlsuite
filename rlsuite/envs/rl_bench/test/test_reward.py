@@ -20,7 +20,7 @@ if __name__ == '__main__':
             'shaped_rewards': True,
         },
         'observations':{
-            'low_dim_obs': ['joint_positions', 'joint_velocities', 'gripper_open'],
+            'low_dim_obs': ['joint_positions', 'joint_velocities', 'relative_position', 'gripper_open'],
             'high_dim_obs': {
                 'rgb': [],
                 'mask': [],
@@ -44,32 +44,27 @@ if __name__ == '__main__':
     
     desc, obs = env.reset()
     done = False 
-
-    demos = env.get_demos()
     
     
     import matplotlib.pyplot as plt
-    from tqdm import tqdm
+    import math
     plt.figure()
-    
-    for epi_idx, espisode_demo in enumerate(demos):
-        observations = espisode_demo['observations']
-        actions = espisode_demo['actions']
-        rewards = espisode_demo['rewards']
-        terminals = espisode_demo['terminals']
-        
-        reward_list, dist_list = [], []
-        for idx in tqdm(range(len(observations)), desc=f'epsidoe {epi_idx}'):
-            target_position = observations[idx]['task_low_dim_state']
-            ee_position = observations[idx]['gripper_pose'][:3]
-            
-            dist = np.linalg.norm(ee_position - target_position)
 
-            dist_list.append(dist)
-            reward_list.append(rewards[idx])
-            
-        plt.plot(dist_list, label=f'dist_{epi_idx}')
-        plt.plot(reward_list, label=f'reward_{epi_idx}')
+    idx = 1
+    dist_list, reward_list = [], []
+    while not done:
+        tic = time.time()
+        obs, reward, done, info = env.step(env.sample_action())
+        # print(obs, reward, terminate, info)
+        print(f"step {idx}: {time.time() - tic}")
+        idx += 1
+        
+        dist = np.linalg.norm(obs[-4:-1])
+        dist_list.append(dist)
+        reward_list.append(reward)
+        
+    plt.plot(dist_list, label=f'dist')
+    plt.plot(reward_list, label=f'reward')
         
     plt.legend()
     plt.savefig('/HDD/etc/outputs/dist_reward.png')
