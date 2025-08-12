@@ -155,6 +155,35 @@ class RLBenchEnv:
         action_max[-1] = 1
         self._action_stats = {"min": action_min, "max": action_max}
         
+    def rescale_demo_actions(
+        self, demo: list) -> list:
+        actions = []
+        for action_ in demo['actions']:
+            action = self._convert_action_from_raw(action_)
+            actions.append(action)
+        demo['actions'] = actions
+        return demo
+        
+    def _convert_action_to_raw(self, action):
+        """Convert [-1, 1] action to raw joint space using action stats"""
+        assert (max(action) <= 1) and (min(action) >= -1)
+        action_min, action_max = self._action_stats["min"], self._action_stats["max"]
+        _action_min = action_min - np.fabs(action_min) * 0.2
+        _action_max = action_max + np.fabs(action_max) * 0.2
+        new_action = (action + 1) / 2.0  # to [0, 1]
+        new_action = new_action * (_action_max - _action_min) + _action_min  # original
+        return new_action.astype(action.dtype, copy=False)
+
+    def _convert_action_from_raw(self, action):
+        """Convert raw action in joint space to [-1, 1] using action stats"""
+        action_min, action_max = self._action_stats["min"], self._action_stats["max"]
+        _action_min = action_min - np.fabs(action_min) * 0.2
+        _action_max = action_max + np.fabs(action_max) * 0.2
+
+        new_action = (action - _action_min) / (_action_max - _action_min)  # to [0, 1]
+        new_action = new_action * 2 - 1  # to [-1, 1]
+        return new_action.astype(action.dtype, copy=False)
+        
     def reset(self, **kwargs):
         # Clear deques used for frame stacking
         self._num_steps = 0
@@ -170,6 +199,7 @@ class RLBenchEnv:
         return description, obs    
     
     def step(self, action):
+        action = self._convert_action_to_raw(action)
         obs, reward, terminate = self._task.step(action)
         self._num_steps += 1
         
@@ -250,6 +280,22 @@ class RLBenchEnv:
         return out
         
         
+    def extract_action_stats(self, demos: list):
+        actions = []
+        for demo in demos:
+            for action in demo['actions']:
+                actions.append(action)
+        actions = np.stack(actions)
+
+        # Gripper one-hot action's stats are hard-coded
+        action_max = np.hstack([np.max(actions, 0)[:-1], 1])
+        action_min = np.hstack([np.min(actions, 0)[:-1], 0])
+        action_stats = {
+            "max": action_max,
+            "min": action_min,
+        }
+        return action_stats
+        
     def get_demos(self, modify=True):
         
         live_demos = not self._config['env']['dataset_root']
@@ -266,10 +312,10 @@ class RLBenchEnv:
             else:
                 print("Skipping episode-demo for large delta action")
                 
-        # # override action stats with demonstration-based stats
-        # self._action_stats = self.extract_action_stats(demos)
-        # # rescale actions with action stats
-        # demos = [self.rescale_demo_actions(demo) for demo in demos]
+        # override action stats with demonstration-based stats
+        self._action_stats = self.extract_action_stats(demos)
+        # rescale actions with action stats
+        demos = [self.rescale_demo_actions(demo) for demo in demos]
         
         return demos
         
@@ -342,9 +388,10 @@ if __name__ == '__main__':
             'arm_max_velocity': 2.0,
             'arm_max_acceleration': 8.0,
             'dataset_root': '/HDD/etc/rlbench_demo/reach_target_100',
+            'headless': True,
         },
         'observations':{
-            'low_dim_obs': ['joint_positions', 'joint_velocities', 'gripper_open'],
+            'low_dim_obs': ['joint_positions', 'joint_velocities', 'relative_position', 'gripper_open'],
             'high_dim_obs': {
                 'rgb': [],
                 'mask': [],
@@ -360,6 +407,8 @@ if __name__ == '__main__':
             'render_mode': 'rgb_array',
         },
         'step_length': 100,
+        'custom_reward': 'reshape_reward_function',
+        
             
     }
     env = RLBenchEnv(config)
@@ -378,5 +427,5 @@ if __name__ == '__main__':
 
     
 
-    # demos = env.get_demos()
-    # print(demos)
+    demos = env.get_demos()
+    print(demos)

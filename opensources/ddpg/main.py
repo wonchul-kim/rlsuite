@@ -96,8 +96,9 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='PyTorch on TORCS with Multi-modal')
 
-    parser.add_argument('--mode', default='test', type=str, help='support option: train/test')
-    parser.add_argument('--env', default='Pendulum-v1', type=str, help='open-ai gym environment')
+    parser.add_argument('--mode', default='train', type=str, help='support option: train/test')
+    # parser.add_argument('--env', default='Pendulum-v1', type=str, help='open-ai gym environment')
+    parser.add_argument('--env', default='FetchReachDense-v3', type=str, help='open-ai gym environment')
     parser.add_argument('--hidden1', default=400, type=int, help='hidden num of first fully connect layer')
     parser.add_argument('--hidden2', default=300, type=int, help='hidden num of second fully connect layer')
     parser.add_argument('--rate', default=0.001, type=float, help='learning rate')
@@ -120,7 +121,7 @@ if __name__ == "__main__":
     parser.add_argument('--train_iter', default=200000, type=int, help='train iters each timestep')
     parser.add_argument('--epsilon', default=50000, type=int, help='linear decay of exploration policy')
     parser.add_argument('--seed', default=-1, type=int, help='')
-    parser.add_argument('--resume', default='output/Pendulum-v1-run16', type=str, help='Resuming model path for testing')
+    parser.add_argument('--resume', default='default', type=str, help='Resuming model path for testing')
     # parser.add_argument('--l2norm', default=0.01, type=float, help='l2 weight decay') # TODO
     # parser.add_argument('--cuda', dest='cuda', action='store_true') # TODO
 
