@@ -1,5 +1,6 @@
 .thumbs
 *.out
+output/*
 
 # Distribution / packaging
 .Python
