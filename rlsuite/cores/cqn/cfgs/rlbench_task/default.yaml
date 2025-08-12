@@ -1,0 +1,8 @@
+dataset_root: '/HDD/etc/rlbench_demo'
+camera_shape: [84,84]
+# camera_keys: [front,wrist,left_shoulder,right_shoulder]
+camera_keys: [front, wrist]
+state_keys: [joint_positions,gripper_open]
+renderer: opengl3
+num_demos: 100
+num_train_frames: 30250

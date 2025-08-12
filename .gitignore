@@ -1,6 +1,7 @@
 .thumbs
 *.out
 output/*
+exp_local/*
 
 # Distribution / packaging
 .Python
