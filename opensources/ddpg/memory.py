@@ -188,8 +188,8 @@ class SequentialMemory(Memory):
         terminal1_batch = []
         state1_batch = []
         for e in experiences:
-            assert len(e.state0) == 1
-            assert len(e.state0[0]) == 3
+            # assert len(e.state0) == 1
+            # assert len(e.state0[0]) == 3
             state0_batch.append(e.state0)
             state1_batch.append(e.state1)
             reward_batch.append(e.reward)

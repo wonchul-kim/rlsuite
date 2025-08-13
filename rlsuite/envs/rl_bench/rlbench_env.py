@@ -17,9 +17,7 @@ from collections import deque
 
 
 def reshape_reward_function(obs, done, reward):
-    gripper_position = obs.gripper_pose[:3]
-    target_position = obs.task_low_dim_state
-    dist = np.linalg.norm(gripper_position - target_position)
+    dist = get_dist_from_target(obs)
     alpha = 4
     dist_reward = np.exp(-alpha*dist)
     max_dist = 0.85
@@ -30,6 +28,13 @@ def reshape_reward_function(obs, done, reward):
         reward += 5
         
     return reward
+
+def get_dist_from_target(obs):
+    gripper_position = obs.gripper_pose[:3]
+    target_position = obs.task_low_dim_state
+    dist = np.linalg.norm(gripper_position - target_position)
+    
+    return dist
         
 class RLBenchEnv:
     def __init__(self, config):
@@ -72,7 +77,8 @@ class RLBenchEnv:
                         arm_max_acceleration=arm_max_acceleration,
                         obs_config=obs_config,
                         dataset_root=self._config['env']['dataset_root'],
-                        headless=self._config['env']['headless'])
+                        headless=self._config['env']['headless'],
+                        shaped_rewards=self._config['env'].get('shaped_rewards', False))
         self._env.launch()
 
         self._task = self._env.get_task(name_to_task_class(task_name))
