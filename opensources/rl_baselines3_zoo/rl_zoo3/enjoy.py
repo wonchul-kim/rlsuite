@@ -19,9 +19,9 @@ from rl_zoo3.utils import StoreDict, get_model_path
 
 def enjoy() -> None:  # noqa: C901
     parser = argparse.ArgumentParser()
-    parser.add_argument("--env", help="environment ID", type=EnvironmentName, default="FetchReach-v1")
+    parser.add_argument("--env", help="environment ID", type=EnvironmentName, default="FetchReach-v4")
     # parser.add_argument("--env", help="environment ID", type=EnvironmentName, default="CartPole-v1")
-    parser.add_argument("-f", "--folder", help="Log folder", type=str, default="logs/")
+    parser.add_argument("-f", "--folder", help="Log folder", type=str, default="/HDD/etc/outputs/rl_zoo")
     parser.add_argument("--algo", help="RL Algorithm", default="tqc", type=str, required=False, choices=list(ALGOS.keys()))
     parser.add_argument("-n", "--n-timesteps", help="number of timesteps", default=1000, type=int)
     parser.add_argument("--num-threads", help="Number of threads for PyTorch (-1 to use default)", default=-1, type=int)
@@ -237,9 +237,13 @@ def enjoy() -> None:  # noqa: C901
         generator = tqdm(generator)
 
     try:
+        os.makedirs(os.path.join(log_path, f'videos/'), exist_ok=True)
         import imageio.v2 as iio
-        writer = iio.get_writer("/HDD/etc/outputs/tqc/videos/rollout.mp4", fps=20)
+        writer = iio.get_writer(os.path.join(log_path, "videos/rollout.gif"))
+        
+        cnt = 0
         for _ in generator:
+            cnt += 1
             action, lstm_states = model.predict(
                 obs,  # type: ignore[arg-type]
                 state=lstm_states,

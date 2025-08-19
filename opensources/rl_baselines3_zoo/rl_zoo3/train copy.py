@@ -19,11 +19,8 @@ from rl_zoo3.utils import ALGOS, StoreDict
 
 def train() -> None:
     parser = argparse.ArgumentParser()
-    # parser.add_argument("--algo", help="RL Algorithm", default="ppo", type=str, required=False, choices=list(ALGOS.keys()))
-    parser.add_argument("--algo", help="RL Algorithm", default="tqc", type=str, required=False, choices=list(ALGOS.keys()))
-    # parser.add_argument("--env", type=str, default="CartPole-v1", help="environment ID")
-    parser.add_argument("--env", type=str, default="FetchReach-v4", help="environment ID")
-    # parser.add_argument("--env", type=str, default="FetchReach-v1", help="environment ID")
+    parser.add_argument("--algo", help="RL Algorithm", default="ppo", type=str, required=False, choices=list(ALGOS.keys()))
+    parser.add_argument("--env", type=str, default="CartPole-v1", help="environment ID")
     parser.add_argument("-tb", "--tensorboard-log", help="Tensorboard log dir", default="", type=str)
     parser.add_argument("-i", "--trained-agent", help="Path to a pretrained agent to continue training", default="", type=str)
     parser.add_argument(
@@ -60,8 +57,7 @@ def train() -> None:
     parser.add_argument(
         "--save-replay-buffer", help="Save the replay buffer too (when applicable)", action="store_true", default=False
     )
-    # parser.add_argument("-f", "--log-folder", help="Log folder", type=str, default="logs")
-    parser.add_argument("-f", "--log-folder", help="Log folder", type=str, default="/HDD/etc/outputs/tqc")
+    parser.add_argument("-f", "--log-folder", help="Log folder", type=str, default="logs")
     parser.add_argument("--seed", help="Random generator seed", type=int, default=-1)
     parser.add_argument("--vec-env", help="VecEnv type", type=str, default="dummy", choices=["dummy", "subproc"])
     parser.add_argument("--device", help="PyTorch device to be use (ex: cpu, cuda...)", default="auto", type=str)
@@ -143,8 +139,7 @@ def train() -> None:
         "-conf",
         "--conf-file",
         type=str,
-        default='/HDD/_projects/github/rlsuite/opensources/rl_baselines3_zoo/hyperparams/tqc.yml',
-        # default='/HDD/_projects/github/rlsuite/opensources/rl_baselines3_zoo/hyperparams/ddpg.yml',
+        default=None,
         help="Custom yaml file or python package from which the hyperparameters will be loaded."
         "We expect that python packages contain a dictionary called 'hyperparams' which contains a key for each environment.",
     )
