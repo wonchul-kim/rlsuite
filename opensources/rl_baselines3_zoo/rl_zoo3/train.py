@@ -22,8 +22,9 @@ def train() -> None:
     # parser.add_argument("--algo", help="RL Algorithm", default="ppo", type=str, required=False, choices=list(ALGOS.keys()))
     parser.add_argument("--algo", help="RL Algorithm", default="tqc", type=str, required=False, choices=list(ALGOS.keys()))
     # parser.add_argument("--env", type=str, default="CartPole-v1", help="environment ID")
-    parser.add_argument("--env", type=str, default="FetchReach-v4", help="environment ID")
-    # parser.add_argument("--env", type=str, default="M1013Env-v0", help="environment ID")
+    # parser.add_argument("--env", type=str, default="FetchReach-v4", help="environment ID")
+    parser.add_argument("--env", type=str, default="M1013Env-v0", help="environment ID")
+    # parser.add_argument("--env", type=str, default="M1013Env-v1", help="environment ID")
     parser.add_argument("-tb", "--tensorboard-log", help="Tensorboard log dir", default="", type=str)
     parser.add_argument("-i", "--trained-agent", help="Path to a pretrained agent to continue training", default="", type=str)
     parser.add_argument(
@@ -177,10 +178,18 @@ def train() -> None:
     import gymnasium_robotics
     import gymnasium as gym
     gym.register_envs(gymnasium_robotics)
-    from rlsuite.envs.m1013.m1013_env import M1013Env
+    
+    from robot_sim.robots.doosan.env import M1013Env
     gym.register(
         id="M1013Env-v0",
         entry_point=M1013Env,
+        # max_episode_steps=100,  # Prevent infinite episodes
+    )
+    
+    from robot_sim.robots.doosan.env_v2 import M1013EnvV2
+    gym.register(
+        id="M1013Env-v1",
+        entry_point=M1013EnvV2,
         # max_episode_steps=100,  # Prevent infinite episodes
     )
 
